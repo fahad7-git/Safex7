@@ -1,0 +1,7 @@
+from joblib import load
+model = load("phish_model.joblib")
+
+prediction = model.predict([feature_vector])[0]
+if prediction == 1:
+    risk += 30
+    reasons.append("ML model detected phishing patterns")

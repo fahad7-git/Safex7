@@ -1,0 +1,3 @@
+url,length,has_https,has_ip,label
+http://google.com,17,1,0,0
+http://login-paypal.fake,23,0,0,1
