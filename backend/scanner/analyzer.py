@@ -3,6 +3,7 @@ import requests
 import re
 import whois
 import socket
+import os
 from urllib.parse import urlparse, urlencode
 from datetime import datetime
 import json
@@ -314,9 +315,25 @@ def analyze_url(url):
         import joblib
         from scanner.features import extract_features
         
-        # Try to load ML model
-        try:
-            model = joblib.load('phishing_model.joblib')
+        # Try to load ML model - use absolute path relative to the backend folder
+        model_paths = [
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), 'phishing_model.joblib'),
+            os.path.join(os.path.dirname(__file__), 'phishing_model.joblib'),
+            'phishing_model.joblib'
+        ]
+        
+        model = None
+        for model_path in model_paths:
+            try:
+                if os.path.exists(model_path):
+                    model = joblib.load(model_path)
+                    print(f"ML Model loaded from: {model_path}")
+                    break
+            except Exception as load_err:
+                print(f"Could not load model from {model_path}: {load_err}")
+                continue
+        
+        if model is not None:
             features = extract_features(url)
             
             # Create feature vector
@@ -336,8 +353,7 @@ def analyze_url(url):
             if ml_prediction == 1:
                 score += int(max(ml_proba) * 30)
                 reasons.append(f"ML Model identifies this as PHISHING ({max(ml_proba)*100:.1f}% confidence)")
-                
-        except FileNotFoundError:
+        else:
             technical_details['ml_model'] = 'not_found'
             
     except Exception as e:

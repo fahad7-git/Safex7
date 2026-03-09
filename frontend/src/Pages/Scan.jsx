@@ -46,7 +46,30 @@ export default function Scan() {
 
     try {
       console.log(" Sending request to backend scanner...");
-      const res = await axios.post("http://127.0.0.1:5000/scan", { url });
+      
+      // For local development, use relative path to leverage the proxy
+      // The proxy is configured in package.json to forward to localhost:5000
+      // For production, use the REACT_APP_API_URL environment variable
+      
+      const getBackendUrl = () => {
+        // Check for environment variable first (production)
+        const envUrl = process.env.REACT_APP_API_URL;
+        if (envUrl) {
+          console.log(" Using production API URL:", envUrl);
+          return envUrl;
+        }
+        
+        // For local development - use relative path to enable proxy
+        // The proxy in package.json will forward to localhost:5000
+        console.log(" Using proxy (relative path)");
+        return "";
+      };
+      
+      const API_BASE = getBackendUrl();
+      console.log(" API Base:", API_BASE ? API_BASE : "(proxy)");
+      
+      // Make request - use relative path for proxy
+      const res = await axios.post(`${API_BASE}/scan`, { url });
 
       console.log(" SCAN COMPLETE - RESULTS RECEIVED");
       console.log("--------------------------------------------------");
@@ -98,15 +121,33 @@ export default function Scan() {
       console.log(" ERROR DURING SCAN");
       console.log("--------------------------------------------------");
       console.log(" Error Message:", err.message);
+      console.log(" Error Response:", err.response);
+      console.log(" Error Code:", err.code);
+
+      // Determine the error message based on the type of error
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
+        if (isLocalhost) {
+          errorMessage = "Cannot connect to backend. Please ensure the Flask server is running on port 5000. Make sure you started it with 'python app.py' in the backend folder.";
+        } else {
+          errorMessage = "Cannot connect to the scanner service. Please ensure the API is deployed and running.";
+        }
+      } else if (err.response?.status === 404) {
+        errorMessage = "Scanner endpoint not found. Please check the API configuration.";
+      } else if (err.response?.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else {
+        errorMessage = err.message || "Failed to scan URL. Please try again.";
+      }
 
       setScanData({
         verdict: "Error",
         risk_score: 0,
         risk_level: "Error",
-        reasons: [
-          "Failed to connect to scanner. Please ensure backend is running on port 5000.",
-        ],
-        details: {},
+        reasons: [errorMessage],
+        details: { error_details: err.message },
       });
     } finally {
       setLoading(false);
@@ -567,6 +608,7 @@ export default function Scan() {
                       {scanData.details?.total_checks_performed || 25} checks
                     </p>
                   </div>
+                  
                 </div>
               )}
 
