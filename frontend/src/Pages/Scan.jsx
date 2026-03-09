@@ -47,28 +47,13 @@ export default function Scan() {
     try {
       console.log(" Sending request to backend scanner...");
       
-      // For local development, use relative path to leverage the proxy
-      // The proxy is configured in package.json to forward to localhost:5000
-      // For production, use the REACT_APP_API_URL environment variable
+      // Use relative path for API calls - works both locally and in production
+      // The proxy in package.json handles local development
+      // In production, Flask serves both frontend and backend from the same domain
+      const API_BASE = "";
+      console.log(" Using relative API path");
       
-      const getBackendUrl = () => {
-        // Check for environment variable first (production)
-        const envUrl = process.env.REACT_APP_API_URL;
-        if (envUrl) {
-          console.log(" Using production API URL:", envUrl);
-          return envUrl;
-        }
-        
-        // For local development - use relative path to enable proxy
-        // The proxy in package.json will forward to localhost:5000
-        console.log(" Using proxy (relative path)");
-        return "";
-      };
-      
-      const API_BASE = getBackendUrl();
-      console.log(" API Base:", API_BASE ? API_BASE : "(proxy)");
-      
-      // Make request - use relative path for proxy
+      // Make request
       const res = await axios.post(`${API_BASE}/scan`, { url });
 
       console.log(" SCAN COMPLETE - RESULTS RECEIVED");

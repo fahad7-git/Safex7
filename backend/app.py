@@ -18,7 +18,11 @@ CORS(app,
 
 # Get the directory paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Look for frontend build in parent directory (backend/ is subdirectory of project root)
 FRONTEND_BUILD = os.path.join(BASE_DIR, '..', 'frontend', 'build')
+# Also check current directory structure
+if not os.path.exists(FRONTEND_BUILD):
+    FRONTEND_BUILD = os.path.join(BASE_DIR, 'frontend', 'build')
 
 @app.route("/scan", methods=["POST", "OPTIONS"])
 @app.route("/api/scan", methods=["POST", "OPTIONS"])
