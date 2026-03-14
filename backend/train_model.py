@@ -3,7 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from joblib import dump
 
 # Load dataset
-df = pd.read_csv("../dataset/phishing_dataset.csv")
+df = pd.read_csv("phishing_dataset.csv")
 
 
 X = df.drop("label", axis=1)
@@ -14,6 +14,6 @@ model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X, y)
 
 # Save trained model
-dump(model, "phish_model.joblib")
+dump(model, "phishing_model.joblib")
 
 print("✅ Model trained & saved as phish_model.joblib")

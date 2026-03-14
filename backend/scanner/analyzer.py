@@ -7,6 +7,7 @@ import os
 from urllib.parse import urlparse, urlencode
 from datetime import datetime
 import json
+import joblib
 
 # Suspicious TLDs often used in phishing
 SUSPICIOUS_TLDS = ['xyz', 'top', 'club', 'win', 'online', 'site', 'work', 'buzz', 

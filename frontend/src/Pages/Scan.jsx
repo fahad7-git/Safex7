@@ -18,7 +18,7 @@ export default function Scan() {
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section],
+      [section]: !prev[section],re
     }));
   };
 

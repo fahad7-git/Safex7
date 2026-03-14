@@ -1,16 +1,19 @@
+redirectsOrigin = "config"
 plugins = []
 headers = []
-redirects = []
 
 [functions]
 
 [functions."*"]
 
 [build]
-publish = "C:\\Users\\fahad\\OneDrive\\Desktop\\Safex7"
-publishOrigin = "default"
+publish = "C:\\Users\\fahad\\OneDrive\\Desktop\\Safex7\\frontend\\build"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "cd backend && pip install -r requirements.txt"
 
 [build.environment]
+PYTHON_VERSION = "3.11"
 
 [build.processing]
 
@@ -23,3 +26,15 @@ publishOrigin = "default"
 [build.processing.js]
 
 [build.services]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
